@@ -18,6 +18,24 @@ public class EchoClient {
 		InputStream socketInputStream = socket.getInputStream();
 		OutputStream socketOutputStream = socket.getOutputStream();
 
-		// Put your code here.
+		try {
+
+			int byteRead;
+
+			while ((byteRead = System.in.read()) != -1) {
+				socketOutputStream.write(byteRead);
+				socketOutputStream.flush();
+				System.out.write(socketInputStream.read());
+				System.out.flush();
+			}
+
+			socket.shutdownOutput();
+
+		} catch (IOException ioe) {
+			System.out.println("We caught an unexpected exception");
+			System.err.println(ioe);
+		} finally {
+			socket.close();
+		}
 	}
 }
