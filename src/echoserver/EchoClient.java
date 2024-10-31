@@ -18,6 +18,9 @@ public class EchoClient {
 		InputStream socketInputStream = socket.getInputStream();
 		OutputStream socketOutputStream = socket.getOutputStream();
 
+		Thread inputThread = new Thread(new InputHandler(socketOutputStream));
+		Thread outputThread = new Thread(new OutputHandler(socketInputStream));
+
 		try {
 
 			int byteRead;
