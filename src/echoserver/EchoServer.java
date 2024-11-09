@@ -7,25 +7,33 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class EchoServer {
-	
-	// REPLACE WITH PORT PROVIDED BY THE INSTRUCTOR
-	public static final int PORT_NUMBER = 0; 
-	public static void main(String[] args) throws IOException, InterruptedException {
-		EchoServer server = new EchoServer();
-		server.start();
-	}
+    public static final int PORT_NUMBER = 6013;
 
-	private void start() throws IOException, InterruptedException {
-		ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
-		while (true) {
-			Socket socket = serverSocket.accept();
+    public static void main(String[] args) throws IOException, InterruptedException {
+        EchoServer server = new EchoServer();
+        server.start();
+    }
 
-			// Put your code here.
-			// This should do very little, essentially:
-			//   * Construct an instance of your runnable class
-			//   * Construct a Thread with your runnable
-			//      * Or use a thread pool
-			//   * Start that thread
-		}
-	}
+    private void start() throws IOException, InterruptedException {
+
+		// Try to create a server socket
+        try (ServerSocket serverSocket = new ServerSocket(PORT_NUMBER)) {
+			// when a client connects, create a new socket
+            while (true) {
+                Socket socket = serverSocket.accept();
+                InputStream socketInputStream = socket.getInputStream();
+                OutputStream socketOutputStream = socket.getOutputStream();
+
+                // Create the threads
+                Thread inputThread = new Thread(new InputHandler(socketOutputStream));
+                Thread outputThread = new Thread(new OutputHandler(socketInputStream));
+
+                // Start the threads
+                inputThread.start();
+                outputThread.start();
+            }
+        } catch (IOException e) {
+            System.err.println("Server exception: " + e.getMessage());
+        }
+    }
 }
