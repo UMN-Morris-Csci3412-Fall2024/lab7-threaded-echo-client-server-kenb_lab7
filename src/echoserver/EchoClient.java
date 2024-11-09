@@ -6,39 +6,40 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 public class EchoClient {
-	public static final int PORT_NUMBER = 6013;
+    public static final int PORT_NUMBER = 6013;
 
-	public static void main(String[] args) throws IOException {
-		EchoClient client = new EchoClient();
-		client.start();
-	}
+    public static void main(String[] args) throws IOException {
+        EchoClient client = new EchoClient();
+        client.start();
+    }
 
-	private void start() throws IOException {
-		Socket socket = new Socket("localhost", PORT_NUMBER);
-		InputStream socketInputStream = socket.getInputStream();
-		OutputStream socketOutputStream = socket.getOutputStream();
+    private void start() throws IOException {
 
-		Thread inputThread = new Thread(new InputHandler(socketOutputStream));
-		Thread outputThread = new Thread(new OutputHandler(socketInputStream));
+		// Connect to the server
+        Socket socket = new Socket("localhost", PORT_NUMBER);
+		// Get the input and output streams
+        InputStream socketInputStream = socket.getInputStream();
+        OutputStream socketOutputStream = socket.getOutputStream();
 
-		try {
+		// Create the threads
+        Thread inputThread = new Thread(new InputHandler(socketOutputStream));
+        Thread outputThread = new Thread(new OutputHandler(socketInputStream));
 
-			int byteRead;
+		// Start the threads
+        inputThread.start();
+        outputThread.start();
 
-			while ((byteRead = System.in.read()) != -1) {
-				socketOutputStream.write(byteRead);
-				socketOutputStream.flush();
-				System.out.write(socketInputStream.read());
-				System.out.flush();
-			}
-
-			socket.shutdownOutput();
-
-		} catch (IOException ioe) {
-			System.out.println("We caught an unexpected exception");
-			System.err.println(ioe);
-		} finally {
-			socket.close();
-		}
-	}
+		// Try to join the threads
+		// If the threads are interrupted, catch the exception and print an error message
+		// Finally, close the socket
+        try {
+            inputThread.join();
+            socket.shutdownOutput();
+            outputThread.join();
+        } catch (InterruptedException e) {
+            System.err.println("Thread interrupted: " + e.getMessage());
+        } finally {
+            socket.close();
+        }
+    }
 }
