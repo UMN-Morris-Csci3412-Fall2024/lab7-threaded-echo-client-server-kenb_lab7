@@ -8,12 +8,12 @@ import java.net.Socket;
 public class EchoClient {
     public static final int PORT_NUMBER = 6013;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         EchoClient client = new EchoClient();
         client.start();
     }
 
-    private void start() throws IOException {
+    private void start() throws IOException, InterruptedException {
 
 		// Connect to the server
         Socket socket = new Socket("localhost", PORT_NUMBER);
@@ -23,7 +23,7 @@ public class EchoClient {
         OutputStream socketOutputStream = socket.getOutputStream();
 
 		// Create the threads
-        Thread inputThread = new Thread(new InputHandler(socketOutputStream));
+        Thread inputThread = new Thread(new InputHandler(socketOutputStream, socket));
         Thread outputThread = new Thread(new OutputHandler(socketInputStream));
 
 		// Start the threads
@@ -35,7 +35,6 @@ public class EchoClient {
 		// Finally, close the socket
         try {
             inputThread.join();
-            socket.shutdownOutput();
             outputThread.join();
         } catch (InterruptedException e) {
             System.err.println("Thread interrupted: " + e.getMessage());
