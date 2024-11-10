@@ -25,7 +25,7 @@ public class EchoServer {
                 OutputStream socketOutputStream = socket.getOutputStream();
 
                 // Create the threads
-                Thread inputThread = new Thread(new InputHandler(socketOutputStream));
+                Thread inputThread = new Thread(new InputHandler(socketOutputStream, socket));
                 Thread outputThread = new Thread(new OutputHandler(socketInputStream));
 
                 // Start the threads
