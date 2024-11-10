@@ -9,7 +9,8 @@ import java.util.concurrent.Executors;
 public class EchoServer {
     public static final int PORT_NUMBER = 6013;
     private volatile boolean running = true;
-    private final ExecutorService threadPool = Executors.newCachedThreadPool();
+    public static final int THREAD_COUNT = 10;
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(THREAD_COUNT);
 
     public static void main(String[] args) throws IOException, InterruptedException {
         EchoServer server = new EchoServer();

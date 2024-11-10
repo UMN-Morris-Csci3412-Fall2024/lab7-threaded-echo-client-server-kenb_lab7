@@ -18,22 +18,18 @@ public class ClientHandler implements Runnable {
             InputStream socketInputStream = socket.getInputStream();
             OutputStream socketOutputStream = socket.getOutputStream();
 
-            Thread inputThread = new Thread(new InputHandler(socketOutputStream, socket));
-            Thread outputThread = new Thread(new OutputHandler(socketInputStream));
-
-            inputThread.start();
-            outputThread.start();
-
-            inputThread.join();
-            outputThread.join();
-
-        } catch (IOException | InterruptedException e) {
-            System.err.println("Caught exception: " + e.getMessage());
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = socketInputStream.read(buffer)) != -1) {
+                socketOutputStream.write(buffer, 0, bytesRead);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             try {
                 socket.close();
             } catch (IOException e) {
-                System.err.println("Caught exception: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
