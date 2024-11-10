@@ -1,13 +1,15 @@
 package echoserver;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class EchoServer {
     public static final int PORT_NUMBER = 6013;
+    private volatile boolean running = true;
+    private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
     public static void main(String[] args) throws IOException, InterruptedException {
         EchoServer server = new EchoServer();
@@ -19,21 +21,20 @@ public class EchoServer {
 		// Try to create a server socket
         try (ServerSocket serverSocket = new ServerSocket(PORT_NUMBER)) {
 			// when a client connects, create a new socket
-            while (true) {
+            while (running) {
                 Socket socket = serverSocket.accept();
-                InputStream socketInputStream = socket.getInputStream();
-                OutputStream socketOutputStream = socket.getOutputStream();
-
-                // Create the threads
-                Thread inputThread = new Thread(new InputHandler(socketOutputStream, socket));
-                Thread outputThread = new Thread(new OutputHandler(socketInputStream));
-
-                // Start the threads
-                inputThread.start();
-                outputThread.start();
+                threadPool.execute(new ClientHandler(socket));
             }
+
         } catch (IOException e) {
-            System.err.println("Server exception: " + e.getMessage());
+            System.err.println("Caught exception: " + e.getMessage());
+        } finally {
+            threadPool.shutdown();
         }
     }
+
+    public void stop() {
+        running = false;
+    }
 }
+       
