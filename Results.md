@@ -409,5 +409,4 @@ Mon Nov 11 07:18:55 PM CST 2024
 
 - **Scalability:** The multi-threaded approach scales well with an increasing number of client connections, maintaining reasonable execution times even under high load.
 - **Resource Management:** The use of a thread pool helps manage system resources efficiently, preventing the server from being overwhelmed by too many concurrent connections.
-- **Potential Improvements:** Further optimization could be achieved by fine-tuning the thread pool size and exploring other concurrency models, such as asynchronous I/O, to improve performance under extreme load conditions.
 - **Single-threaded Approach:** A single-threaded approach would likely struggle to handle multiple concurrent connections efficiently, leading to longer execution times and potential bottlenecks as each connection would be processed sequentially.
